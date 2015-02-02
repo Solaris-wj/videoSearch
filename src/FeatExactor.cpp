@@ -9,7 +9,7 @@ using namespace cv;
 namespace vs
 {
     extern clock_t start;
-    int FeatExactor::exactFeatures(string &videoName, vector<KeyFrame> &keyFrames, 
+    int FeatExactor::exactFeatures(const string &videoName, vector<KeyFrame> &keyFrames, 
                                     Mat &feat, vector<vector<KeyPoint>> & keys, vector<Mat> &desc)
     {
         start = clock();

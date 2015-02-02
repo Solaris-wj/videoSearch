@@ -20,7 +20,7 @@ namespace vs
         
     public:
         FeatExactor(VideoSearchParam &param) :param_(param),kfExactor(param_.usedFps),orb_detector(MAX_LOCAL_FEAT_NUM){}
-        int exactFeatures(std::string &videoName, std::vector<KeyFrame> &videoShots, cv::Mat &feat,
+        int exactFeatures(const std::string &videoName, std::vector<KeyFrame> &videoShots, cv::Mat &feat,
                           std::vector<std::vector<cv::KeyPoint>> &keys, std::vector<cv::Mat> &desc);
         int getMaxLocalFeatNum()
         {

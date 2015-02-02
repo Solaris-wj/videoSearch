@@ -91,14 +91,7 @@ namespace vs
     {
         if (videoTable_.find(videoName))
             return 1;
-        shared_ptr<vector<KeyFrame>> keyFrames(new vector<KeyFrame>);
-        shared_ptr<Mat> feat(new Mat);
-        shared_ptr<vector<vector<KeyPoint>>> keys(new vector<vector<KeyPoint>>);
-        shared_ptr<vector<Mat>> desc(new vector<Mat>);
 
-        start = clock();
-        if (-1 == featExactor_.exactFeatures(videoName, *keyFrames.get(), *feat.get(), *keys.get(), *desc.get()))
-            return -1;
 
         //printf("exact tar vf time = %lf s\n", (double)(clock() - start) / CLOCKS_PER_SEC);
 

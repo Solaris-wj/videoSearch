@@ -1,28 +1,24 @@
 #ifndef VideoIndex_ENGINE_H_H
 #define VideoIndex_ENGINE_H_H
 
-#include <flann/flann.hpp>
+#include "flann/flann.hpp"
 
 #include "NonCopyable.h"
 #include "DataTable.h"
 #include "FeatExactor.h"
 #include "VideoSearchParam.h"
 
-#include "MultiThreadIndex.h"
-
 namespace vs
 {
     class VideoIndexEngine:public NonCopyable
     {
-        typedef ::flann::MultiThreadIndex<::flann::L1<float>> FrameIndex;
     private:
         std::string indexDataPath_;
         std::string videoDataPath_;
         //std::string algoConfFilePath;
         VideoSearchParam param_;
         DataTable videoTable_;
-        FeatExactor featExactor_;
-        std::shared_ptr<FrameIndex> frameIndex_;        
+
     public:
         //VideoIndexEngine(std::string root="./");
         VideoIndexEngine(std::string indexDataPath, std::string videoDataPath, std::string algoConfFilePath);

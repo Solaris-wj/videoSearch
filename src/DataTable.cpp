@@ -20,73 +20,94 @@ namespace vs
     {
         //save();
     }
-    DataTable::DataTable(const DataTable & other)
-    {
-        //this->dataPath_ = other.dataPath_;        
-        //for (size_t i = 0; i != other.deletedFlags_.size(); ++i)
-        //{
-        //    if (other.deletedFlags_[i] == false)
-        //    {
-        //        insertVideo(other.videoNames_[i],other.keyFrames_[i],other.frameFeats_[i],
-        //                    other.frameKeyPoints_[i],other.frameDescriptors_[i],other.descIndex_[i]);
-        //    }
-        //}
-    }
 
-    DataTable & DataTable::operator=(DataTable & other)
-    {
-        this->swap(other);
-        return *this;
-    }
-    void DataTable::swap(DataTable &other)
-    {
-        this->dataPath_.swap(other.dataPath_);
-        this->videoNames_.swap(other.videoNames_);
-        this->frameFeats_.swap(other.frameFeats_);
-        this->frameCnts_.swap(other.frameCnts_);
-        this->globalFmInd2Vid_.swap(other.globalFmInd2Vid_);
-        this->globalFmInd2LocalFmInd_.swap(other.globalFmInd2LocalFmInd_);    
-        isChanged = true;
-    }
+//     DataTable::DataTable(const DataTable & other)
+//     {
+//         //this->dataPath_ = other.dataPath_;        
+//         //for (size_t i = 0; i != other.deletedFlags_.size(); ++i)
+//         //{
+//         //    if (other.deletedFlags_[i] == false)
+//         //    {
+//         //        insertVideo(other.videoNames_[i],other.keyFrames_[i],other.frameFeats_[i],
+//         //                    other.frameKeyPoints_[i],other.frameDescriptors_[i],other.descIndex_[i]);
+//         //    }
+//         //}
+//     }
+
+//     DataTable & DataTable::operator=(DataTable & other)
+//     {
+//         this->swap(other);
+//         return *this;
+//     }
+
+//     void DataTable::swap(DataTable &other)
+//     {
+//         this->dataPath_.swap(other.dataPath_);
+//         this->videoPaths_.swap(other.videoPaths_);
+//         this->frameFeats_.swap(other.frameFeats_);
+//         this->frameCnts_.swap(other.frameCnts_);
+//         this->globalFmId2Vid_.swap(other.globalFmId2Vid_);
+//         this->globalFmInd2LocalFmInd_.swap(other.globalFmInd2LocalFmInd_);    
+//         isChanged = true;
+//     }
 
 
-    int DataTable::insertVideo(const string videoName, const shared_ptr<vector<KeyFrame>> kfm,
-                     const shared_ptr<Mat> feat, const shared_ptr<vector<vector<KeyPoint>>> keypoints,
-                     const shared_ptr<vector<Mat>> desc)
+    int DataTable::insertVideo(const string videoName)
     {
         //already exist 
-        auto iter=vn2vid_.find(videoName);
-        if (iter==vn2vid_.end())
+        auto iter=vn2vId_.find(videoName);
+        if (iter == vn2vId_.end())
             return -1;
-     
-        videoNames_.push_back(videoName);  
-        vn2vid_.insert(make_pair(videoName, videoNames_.size()-1));
 
-        frameFeats_.push_back(feat);
+        size_t vid = vn2vId_.size() + 1;
+        vn2vId_.insert(make_pair(videoName, vid));
+
+
+        shared_ptr<vector<KeyFrame>> kfm(new vector<KeyFrame>);
+        shared_ptr<Mat> feat(new Mat);
+        shared_ptr<vector<vector<KeyPoint>>> keys(new vector<vector<KeyPoint>>);
+        shared_ptr<vector<Mat>> desc(new vector<Mat>);
+
+        if (-1 == featExactor_.exactFeatures(videoName, *kfm.get(), *feat.get(), *keys.get(), *desc.get()))
+        {
+            return -1;
+        }
+
+        videoFrameFeats_.insert(make_pair(vid, feat));
         frameCnts_.push_back(feat->rows);
 
-        globalFmInd2Vid_.insert(globalFmInd2Vid_.end(), feat->rows, videoNames_.size() - 1);
-        std::vector<int> temp(feat->rows);
-        std::iota(temp.begin(), temp.end(), 0);
-        globalFmInd2LocalFmInd_.insert(globalFmInd2LocalFmInd_.end(), temp.begin(), temp.end());
+
+
+        ::flann::Matrix<float> points((float *)(feat->data), feat->rows, feat->cols);
+        vector<size_t> frameIds = frameIndex_->addPoints(points);
+
+        for (size_t i = 0; i = !frameIds.size(); ++i)
+        {
+            gFmId2VId_.insert(make_pair(frameIds[i], vid));
+            gFmId2lFmId_.insert(make_pair(frameIds[i], i));
+        }
+
+        vId2gFmId_.insert(make_pair(vid, std::move(frameIds)));
+
+
 
         boost::filesystem::path pt(videoName);
-
         ostringstream ostrstream;
         ostrstream << dataPath_ << PATH_SEPARATOR << pt.filename().string() << DATA_FILE_EXT;
-        string outFileName=ostrstream.str();
-        videoDataPaths_.push_back(outFileName);
+        string videoDataPath = ostrstream.str();
 
-        ofstream ofs(outFileName);
+        vId2vDataPath_.insert(make_pair(vid, videoDataPath));
+
+        ofstream ofs(videoDataPath);
         boost::archive::binary_oarchive oar(ofs);
         
         if (kfm != NULL)
         {
             oar & kfm;
         }
-        if (keypoints != NULL)
+        if (keys != NULL)
         {
-            oar & keypoints;
+            oar & keys;
         }
         if (desc != NULL)
         {
@@ -99,44 +120,36 @@ namespace vs
 
     void DataTable::deleteVideos(vector<string> videoNames)
     {
-        vector<size_t> delIndex;
-
-        DataTable temp(this->dataPath_);
-
-        for (size_t i = 0; i < videoNames.size(); i++)
+         for (size_t i = 0; i < videoNames.size(); i++)
         {
-            auto iter=vn2vid_.find(videoNames[i]);
-            if (iter != vn2vid_.end())
-                delIndex.push_back(iter->second);
-        }
+             deleteVideo(videoNames[i]);
+        }           
 
-        
     }
     void DataTable::deleteVideo(std::string videoName)
     {
-        auto iter = vn2vid_.find(videoName);
-        if (iter == vn2vid_.end())
+        auto iter = vn2vId_.find(videoName);
+        if (iter == vn2vId_.end())
             return;
+
         size_t vid = iter->second;
 
-        DataTable temp(this->dataPath_);
-        for (size_t i = 0; i != videoNames_.size(); ++i)
-        {
-            if ()
-            temp.insertVideo(videoNames_[i], NULL, frameFeats_[i], NULL, NULL);
-        }
+        vId2vDataPath_.erase(vid);
+        videoFrameFeats_.erase(vid);
+        
+        auto iter2 = vId2gFmId_.find(vid);
 
-        vn2vid_.erase(videoName);
-        frameFeats_[vid] = nullptr;
-
-        int deletedNum = std::count_if(deletedFlags_.begin(), deletedFlags_.end(), [](bool v){return v == true; });
-        if (deletedNum > videoNames_.size() / 3.0f)
+        auto &vec = iter2->second;
+        for (size_t i = 0; i != vec.size(); ++i)
         {
-            DataTable temp(*this);
-            *this = temp;
-            //DataTable temp;
-            //temp.swap(*this);
+            gFmId2VId_.erase(vec[i]);
+            gFmId2lFmId_.erase(vec[i]);
         }
+        vId2gFmId_.erase(iter2);
+
+        deleteVideoDataFromDisk();
+     
+        vn2vId_.erase(iter); 
         isChanged = true;
     }
 
@@ -178,7 +191,7 @@ namespace vs
     }
     int DataTable::gFmInd2Vid(int gFmInd)
     {
-        return this->globalFmInd2Vid_[gFmInd];
+        return this->globalFmId2Vid_[gFmInd];
     }
 
     int DataTable::gFmInd2LFmInd(int gFmInd)
