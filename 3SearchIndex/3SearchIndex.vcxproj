@@ -22,6 +22,8 @@
     <ClCompile Include="..\src\colorFeat.cpp" />
     <ClCompile Include="..\src\DataTable.cpp" />
     <ClCompile Include="..\src\FeatExactor.cpp" />
+    <ClCompile Include="..\src\flann\ext\lz4.c" />
+    <ClCompile Include="..\src\flann\ext\lz4hc.c" />
     <ClCompile Include="..\src\KeyFrameExactor.cpp" />
     <ClCompile Include="..\src\Preprocessor.cpp" />
     <ClCompile Include="..\src\VideoIndexEngine.cpp" />
@@ -33,10 +35,33 @@
     <ClInclude Include="..\src\colorFeat.h" />
     <ClInclude Include="..\src\DataTable.h" />
     <ClInclude Include="..\src\FeatExactor.h" />
+    <ClInclude Include="..\src\flann\algorithms\all_indices.h" />
+    <ClInclude Include="..\src\flann\algorithms\center_chooser.h" />
+    <ClInclude Include="..\src\flann\algorithms\dist.h" />
+    <ClInclude Include="..\src\flann\algorithms\hierarchical_clustering_index.h" />
+    <ClInclude Include="..\src\flann\algorithms\nn_index.h" />
+    <ClInclude Include="..\src\flann\config.h" />
+    <ClInclude Include="..\src\flann\defines.h" />
+    <ClInclude Include="..\src\flann\ext\lz4.h" />
+    <ClInclude Include="..\src\flann\ext\lz4hc.h" />
+    <ClInclude Include="..\src\flann\flann.hpp" />
+    <ClInclude Include="..\src\flann\general.h" />
+    <ClInclude Include="..\src\flann\util\allocator.h" />
+    <ClInclude Include="..\src\flann\util\any.h" />
+    <ClInclude Include="..\src\flann\util\dynamic_bitset.h" />
+    <ClInclude Include="..\src\flann\util\heap.h" />
+    <ClInclude Include="..\src\flann\util\logger.h" />
+    <ClInclude Include="..\src\flann\util\matrix.h" />
+    <ClInclude Include="..\src\flann\util\object_factory.h" />
+    <ClInclude Include="..\src\flann\util\params.h" />
+    <ClInclude Include="..\src\flann\util\random.h" />
+    <ClInclude Include="..\src\flann\util\result_set.h" />
+    <ClInclude Include="..\src\flann\util\sampling.h" />
+    <ClInclude Include="..\src\flann\util\saving.h" />
+    <ClInclude Include="..\src\flann\util\serialization.h" />
+    <ClInclude Include="..\src\flann\util\timer.h" />
     <ClInclude Include="..\src\index_sort.h" />
     <ClInclude Include="..\src\KeyFrameExactor.h" />
-    <ClInclude Include="..\src\MultiThreadHCindex.h" />
-    <ClInclude Include="..\src\MultiThreadIndex.h" />
     <ClInclude Include="..\src\NonCopyable.h" />
     <ClInclude Include="..\src\Preprocessor.h" />
     <ClInclude Include="..\src\Serialization.h" />
@@ -98,16 +123,16 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>c:\opencv249\build\include;c:\flann-x64\include;c:\boost155;$(IncludePath)</IncludePath>
-    <LibraryPath>c:\opencv249\build\x64\vc12\lib;c:\flann-x64\lib;c:\boost155\lib\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>c:\opencv249\build\include;c:\boost;$(IncludePath)</IncludePath>
+    <LibraryPath>c:\opencv249\build\x64\vc12\lib;c:\Boost\lib64-msvc-12.0;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>c:\opencv249\build\include;c:\flann-x64\include;c:\boost155;$(IncludePath)</IncludePath>
-    <LibraryPath>c:\opencv249\build\x64\vc12\lib;c:\flann-x64\lib;c:\boost155\lib\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>c:\opencv249\build\include;c:\boost;$(IncludePath)</IncludePath>
+    <LibraryPath>c:\opencv249\build\x64\vc12\lib;c:\Boost\lib64-msvc-12.0;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

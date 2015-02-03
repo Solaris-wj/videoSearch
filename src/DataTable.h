@@ -19,8 +19,10 @@
 #include "KeyFrameExactor.h"
 #include "FeatExactor.h"
 
+#include <boost/filesystem.hpp>
 
 #include <boost/serialization/serialization.hpp>
+#include <boost/serialization/split_member.hpp>
 
 namespace vs
 {
@@ -34,57 +36,55 @@ namespace vs
         typedef ::flann::MultiThreadIndex<::flann::L1<float>> FrameIndex;
         friend boost::serialization::access;
     private:
+        std::string indexDataFileName;
+        std::string indexFileName;
         FeatExactor featExactor_;
         std::shared_ptr<FrameIndex> frameIndex_;
 
         //path to save the data into
         std::string dataPath_;
-
-        //full name
-        //std::vector<std::string> videoPaths_;
-        //std::vector<std::string> videoDataPaths_;
-        //std::list<std::string> videoPaths_;
-        //std::list<std::string> videoDataPaths_;
-
         //map of video name to video id and video data path
-        std::unordered_map<std::string, size_t> vn2vId_;
-
-        std::unordered_map<size_t, std::string> vId2vDataPath_;
+        std::unordered_map<std::string, size_t> vn2vid_;
+        std::unordered_map<size_t, std::string> vid2vn_;
+        std::unordered_map<size_t, std::string> vid2vDataPath_;
         //one global feature of every video frames         
         std::unordered_map<size_t , std::shared_ptr<cv::Mat>> videoFrameFeats_;
         //map video id to global frame id
-        std::unordered_map < size_t, std::vector<size_t>> vId2gFmId_;
+        std::unordered_map < size_t, std::vector<size_t>> vid2gFmId_;
         //map global frame id to video id, used in video search phrase (vote for videos)
-        std::unordered_map<size_t, size_t> gFmId2VId_;
+        std::unordered_map<size_t, size_t> gFmId2vid_;
         //map global frame id to frame local id (frame index in corresponding video), used in video ransac function
         std::unordered_map<size_t, size_t> gFmId2lFmId_;
-
-
-        //frame counts of every videos
-        std::vector<int> frameCnts_;   
-        bool isChanged = false;
+        mutable bool isChanged = false;
     public:
-        DataTable(){};
-        explicit DataTable(std::string dataPath);
+        explicit DataTable(std::string dataPath, VideoSearchParam &params);
         explicit DataTable(const DataTable &);
         ~DataTable();
-        //swap assignment 
-        DataTable &operator=(DataTable &);
-        bool find(std::string videoName);
-//         int insertVideo(const std::string videoName, const std::shared_ptr<std::vector<KeyFrame>> keyFrames,
-//                          const std::shared_ptr<cv::Mat> feat, const std::shared_ptr<std::vector<std::vector<cv::KeyPoint>>> keypoints, 
-//                          const std::shared_ptr<std::vector<cv::Mat>> desc, const std::shared_ptr<DescIndex> descIndex);
-
+ 
+        
         int insertVideo(const std::string videoName);
 
         void deleteVideo(std::string videoName);
         void deleteVideos(std::vector<std::string> videoNames);
+        void load();
+        void save();
         //return valid video number
-        int size();
-        int getVideoFmCnt(int vid);
-        int gFmInd2Vid(int gFmInd)
+        
+        FeatExactor & getFeatExactor()
         {
-            return gFmId2VId_.at(gFmInd);
+            return featExactor_;
+        }
+        FrameIndex & getFrameIndex()
+        {
+            return *frameIndex_.get();
+        }
+        int getVideoFmCnt(int vid)
+        {
+            return videoFrameFeats_.at(vid)->rows;
+        }
+        size_t gFmInd2Vid(int gFmInd)
+        {
+            return gFmId2vid_.at(gFmInd);
         }
         int gFmInd2LFmInd(int gFmInd)
         {
@@ -92,30 +92,37 @@ namespace vs
         }
         const std::string& getVideoName(int vid)
         {
-            return videoPaths_[vid];
+            return vid2vn_.at(vid);
         }
 
         void getVideoData(int vid, std::vector<KeyFrame> &kfm, std::vector<std::vector<cv::KeyPoint>> &keys, std::vector<cv::Mat> &desc);
 
-//         std::vector<std::vector<cv::KeyPoint>> & getVideoKeyPoints(int vid);
-//         std::vector<cv::Mat> & getVideoDesc(int vid);
-//         std::vector<KeyFrame>& getVideoKeyFrames(int vid);
-
         std::vector<std::shared_ptr<cv::Mat>>& getVideoFrameFeat();
-        
+        BOOST_SERIALIZATION_SPLIT_MEMBER();
     protected:
         friend class VideoIndexEngine;
         void insertVideoGlobalInfo(std::string videoName);
         void swap(DataTable &other);
-        void save(std::ostream & outStream);
-        int load(std::istream & inStream);
-    };
+//         void save(std::ostream & outStream);
+//         int load(std::istream & inStream);
 
-    inline int DataTable::size()
-    {
-        return videoPaths_.size();
-    }
-    
+        template<class Archive>
+        void save(Archive & oar, const unsigned int version) const; 
+        template<class Archive>
+        void load(Archive & iar, const unsigned int version);
+
+        void deleteVideoDataFrameDisk(size_t vid);
+
+        std::string getVideoDataPath(std::string videoPath)
+        {
+            boost::filesystem::path pt(videoPath);
+            std::string videoDataPath = dataPath_ + PATH_SEPARATOR + pt.filename().string() + "videodata" + DATA_FILE_EXT;
+            return videoDataPath;
+        }
+       
+
+    };
+  
 
 }
 
