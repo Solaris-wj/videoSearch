@@ -9,8 +9,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "2KeyFrameExactor", "2KeyFra
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "3SearchIndex-2", "3SearchIndex\3SearchIndex.vcxproj", "{376B65C2-7222-47ED-8E2D-ED2DE3DE9A8F}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "4JNIexport", "4JNIexport\4JNIexport.vcxproj", "{B802DEA3-52C1-4CEE-A592-5EA95CCF7C7F}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Mixed Platforms = Debug|Mixed Platforms
@@ -57,19 +55,11 @@ Global
 		{376B65C2-7222-47ED-8E2D-ED2DE3DE9A8F}.Release|Win32.Build.0 = Release|Win32
 		{376B65C2-7222-47ED-8E2D-ED2DE3DE9A8F}.Release|x64.ActiveCfg = Release|x64
 		{376B65C2-7222-47ED-8E2D-ED2DE3DE9A8F}.Release|x64.Build.0 = Release|x64
-		{B802DEA3-52C1-4CEE-A592-5EA95CCF7C7F}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
-		{B802DEA3-52C1-4CEE-A592-5EA95CCF7C7F}.Debug|Mixed Platforms.Build.0 = Debug|Win32
-		{B802DEA3-52C1-4CEE-A592-5EA95CCF7C7F}.Debug|Win32.ActiveCfg = Debug|Win32
-		{B802DEA3-52C1-4CEE-A592-5EA95CCF7C7F}.Debug|Win32.Build.0 = Debug|Win32
-		{B802DEA3-52C1-4CEE-A592-5EA95CCF7C7F}.Debug|x64.ActiveCfg = Debug|Win32
-		{B802DEA3-52C1-4CEE-A592-5EA95CCF7C7F}.Release|Mixed Platforms.ActiveCfg = Release|Win32
-		{B802DEA3-52C1-4CEE-A592-5EA95CCF7C7F}.Release|Mixed Platforms.Build.0 = Release|Win32
-		{B802DEA3-52C1-4CEE-A592-5EA95CCF7C7F}.Release|Win32.ActiveCfg = Release|Win32
-		{B802DEA3-52C1-4CEE-A592-5EA95CCF7C7F}.Release|Win32.Build.0 = Release|Win32
-		{B802DEA3-52C1-4CEE-A592-5EA95CCF7C7F}.Release|x64.ActiveCfg = Release|x64
-		{B802DEA3-52C1-4CEE-A592-5EA95CCF7C7F}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(Performance) = preSolution
+		HasPerformanceSessions = true
 	EndGlobalSection
 EndGlobal

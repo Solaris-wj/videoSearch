@@ -1,7 +1,6 @@
 #include "VideoIndexEngine.h"
 
 #include <memory>
-#include <string>
 
 #include <rapidjson/document.h>
 #include <rapidjson/stringbuffer.h>
@@ -25,16 +24,37 @@ using cv::getAffineTransform;
 
 namespace vs
 {
-    VideoIndexEngine::VideoIndexEngine(string dataDir, string logDir, string algoConfFilePath) :
-        dataDir_(dataDir), logDir_(logDir), param_(algoConfFilePath),
-        videoTable_(dataDir, param_)
-    {
-        videoTable_.load();
-    }
+    clock_t start;
 
+    VideoIndexEngine::VideoIndexEngine(string root) :
+        root_(root), param_(string(root + "/conf/algo.conf")),
+        videoTable_(string(root + "/data")), 
+        featExactor_(param_)
+    {
+        //param_.loadFromFile(string(root + "/conf/algo.conf"));
+
+        if (videoTable_.load() != -1)
+        {
+            frameIndex_.reset(new FrameIndex(::flann::SavedIndexParams(string(root + "/data/frameIndex.index"))));
+            
+            auto data =  videoTable_.getVideoFrameFeat();
+
+            for (auto &mat : data)
+            {
+                ::flann::Matrix<float> new_points((float*)mat->data, mat->rows, mat->cols);
+                frameIndex_->extendDataset(new_points);
+            }
+            frameIndex_->load();
+        }
+
+    }
     VideoIndexEngine::~VideoIndexEngine()
     {
-        videoTable_.save();
+        if (frameIndex_)
+        {
+            frameIndex_->save(string(root_ + "/data/frameIndex.index"));
+            videoTable_.save();
+        }
     }
 
     int VideoIndexEngine::addVideo(vector<string> &videoNames)
@@ -47,20 +67,38 @@ namespace vs
     }
     int VideoIndexEngine::addVideo(string &videoName)
     {
-        return videoTable_.insertVideo(videoName);
-    }
+        if (videoTable_.find(videoName))
+            return 1;
+        shared_ptr<vector<KeyFrame>> keyFrames(new vector<KeyFrame>);
+        shared_ptr<Mat> feat(new Mat);
+        shared_ptr<vector<vector<KeyPoint>>> keys(new vector<vector<KeyPoint>>);
+        shared_ptr<vector<Mat>> desc(new vector<Mat>);
 
-    int VideoIndexEngine::deleteVideo(string &videoName)
-    {
-        videoTable_.deleteVideo(videoName);
+        start = clock();
+        if (-1 == featExactor_.exactFeatures(videoName, *keyFrames.get(), *feat.get(), *keys.get(), *desc.get()))
+            return -1;
+
+        //printf("exact tar vf time = %lf s\n", (double)(clock() - start) / CLOCKS_PER_SEC);
+        shared_ptr<DescIndex> descIndex(new DescIndex(::flann::HierarchicalClusteringIndexParams()));
+
+        //::flann::Matrix<uchar> points((uchar*)desc->data, desc->rows, desc->cols);
+        //descIndex->buildIndex(points);
+
+        videoTable_.insertVideo(videoName, keyFrames, feat, keys, desc, descIndex);
+
+        start = clock();
+        if (!frameIndex_)
+        {
+            frameIndex_.reset(new FrameIndex(::flann::HierarchicalClusteringIndexParams()));
+        }
+        ::flann::Matrix<float> points((float*)feat->data, feat->rows, feat->cols);
+        frameIndex_->addPoints(points);
+
+        printf("insert video = %lf s\n", (double)(clock() - start) / CLOCKS_PER_SEC);
 
         return 0;
     }
-    int VideoIndexEngine::deleteVideos(vector<string> &videoNames)
-    {
-        videoTable_.deleteVideos(videoNames);
-        return 0;
-    }
+
 
     bool static set_cmp(const Point2f &pt1, const Point2f &pt2, int threshold)
     {
@@ -91,7 +129,9 @@ namespace vs
 
             orginal_index_pt1.push_back(matches[i].queryIdx);
             orginal_index_pt2.push_back(matches[i].trainIdx);
+
         }
+
 
         ////erase duplicate points 
         auto fn = bind(set_cmp, placeholders::_1, placeholders::_2, threshold);
@@ -116,6 +156,8 @@ namespace vs
             return -1;
         filtered_pt1.swap(pt1);
         filtered_pt2.swap(pt2);
+
+
 
         int max_cnt = 0;
         //int n = 100;
@@ -197,7 +239,7 @@ namespace vs
         }
     }
 
-    clock_t start;
+   
     int VideoIndexEngine::searchVideo(std::string &searchVideoName, vector<std::string> &jsonResult)
     {
         shared_ptr<vector<KeyFrame>> keyFrames(new vector<KeyFrame>);
@@ -205,7 +247,8 @@ namespace vs
         shared_ptr<vector<vector<KeyPoint>>> keys(new vector<vector<KeyPoint>>);
         shared_ptr<vector<Mat>> desc(new vector<Mat>);
 
-        if (-1 == videoTable_.getFeatExactor().exactFeatures(searchVideoName, *keyFrames.get(), *feat.get(), *keys.get(), *desc.get()))
+        start = clock();
+        if (-1 == featExactor_.exactFeatures(searchVideoName, *keyFrames.get(), *feat.get(), *keys.get(), *desc.get()))
         {
             jsonResult = vector<string>();
             return -1;
@@ -215,10 +258,10 @@ namespace vs
         vector<vector<int>> flann_indices;
         vector<vector<float>> flann_dist;
 
+        start = clock();
+        frameIndex_->radiusSearch(flann_queries, flann_indices, flann_dist,2-2*param_.colorThres, ::flann::SearchParams());
 
-        videoTable_.getFrameIndex().radiusSearch(flann_queries, flann_indices, flann_dist,2-2*param_.colorThres, ::flann::SearchParams());
-
-        //printf("flann sear frame = %lf s\n", (double)(clock() - start) / CLOCKS_PER_SEC);
+        printf("flann sear frame = %lf s\n", (double)(clock() - start) / CLOCKS_PER_SEC);
 
 
         //vote for videos 
@@ -256,14 +299,8 @@ namespace vs
             
             start = clock();
 
-            vector<KeyFrame> tar_kf;
-            vector<vector<KeyPoint>> tar_keys;
-            vector<Mat> tar_desc;
-            videoTable_.getVideoData(votesMap[i].first, tar_kf, tar_keys, tar_desc);
-
-
-            videoRansac(*keys.get(), *desc.get(),tar_keys,
-                        tar_desc, matches,filtered_matches);
+            videoRansac(*keys.get(), *desc.get(),videoTable_.getVideoKeyPoints(votesMap[i].first),
+                        videoTable_.getVideoDesc(votesMap[i].first), matches,filtered_matches);
             
             printf("videoRansac time = %lf s\n", (double)(clock() - start) / CLOCKS_PER_SEC);
 
@@ -277,12 +314,12 @@ namespace vs
             
             for (size_t j = 0; j != filtered_matches.size(); ++j)
             {
-                flagMat.ref<uchar>(filtered_matches[j].queryIdx, filtered_matches[j].trainIdx)= filtered_matches[j].distance / videoTable_.getFeatExactor().getMaxLocalFeatNum() * 255;
+                flagMat.ref<uchar>(filtered_matches[j].queryIdx, filtered_matches[j].trainIdx)= filtered_matches[j].distance / featExactor_.getMaxLocalFeatNum() * 255;
             }
 
             //debug
-            //Mat flag;
-            //flagMat.copyTo(flag);
+            Mat flag;
+            flagMat.copyTo(flag);
 
             //match frame index
             vector<pair<int, int> > det_initFrameMatches;
@@ -301,7 +338,7 @@ namespace vs
                 vector<KeyFrame> &det_kf = *keyFrames.get();
                 finalMatchResult_det.emplace_back(det_kf[det_initFrameMatches[j].first].start_index_, det_kf[det_initFrameMatches[j].second].end_index_);
 
-                //vector<KeyFrame> &tar_kf = videoTable_.getVideoKeyFrames(votesMap[i].first);
+                vector<KeyFrame> &tar_kf = videoTable_.getVideoKeyFrames(votesMap[i].first);
                 finalMatchResult_tar.emplace_back(tar_kf[tar_initFrameMatches[j].first].start_index_, tar_kf[tar_initFrameMatches[j].second].end_index_);
             }
             
@@ -312,8 +349,7 @@ namespace vs
             }
 
             string result;
-
-            genJsonStr(videoTable_.getVideoName(votesMap[i].first), finalMatchResult_det, finalMatchResult_tar, result);
+            genJsonStr(searchVideoName, finalMatchResult_det, finalMatchResult_tar, result);
 
             jsonResult.push_back(result);
             
@@ -409,8 +445,8 @@ namespace vs
                                            , vector<pair<int, int>> &matches0, vector<pair<int, int>> &matches1)
     {
         //debug code
-        //Mat flag;
-        //flagMat.copyTo(flag);
+        Mat flag;
+        flagMat.copyTo(flag);
         //debug code over
         Mat recordMap = Mat::zeros(end0 - beg0, end1 - beg1, CV_8UC1);
         const int interval = static_cast<int>(param_.timeInterval*param_.usedFps);
@@ -445,7 +481,7 @@ namespace vs
         }
     }
 
-    int VideoIndexEngine::genJsonStr(const string &targetVideoName, vector<pair<int, int>> & finalMatchResult_det,
+    int VideoIndexEngine::genJsonStr(string &targetVideoName, vector<pair<int, int>> & finalMatchResult_det,
                    vector<pair<int, int>> &finalMatchResult_tar, string &strJsonResult)
     {
 

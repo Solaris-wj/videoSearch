@@ -22,18 +22,13 @@
 #pragma comment(lib,"opencv_highgui249d.lib")
 #pragma comment(lib,"opencv_imgproc249d.lib")
 #pragma comment(lib,"opencv_features2d249d.lib")
-
+#pragma comment(lib,"flann_s.lib")
 #else
 #pragma comment(lib,"opencv_core249.lib")
 #pragma comment(lib,"opencv_highgui249.lib")
 #pragma comment(lib,"opencv_imgproc249.lib")
 #pragma comment(lib,"opencv_features2d249.lib")
-// #pragma comment(lib,"libboost_filesystem-vc120-mt-1_57.lib")
-// #pragma comment(lib,"libboost_serialization-vc120-mt-1_57.lib")
-
-#pragma comment(lib,"boost_filesystem-vc120-mt-1_57.lib")
-#pragma comment(lib,"boost_serialization-vc120-mt-1_57.lib")
-
+#pragma comment(lib,"flann_sr.lib")
 #endif
 #endif
 using namespace std;
@@ -46,12 +41,9 @@ using boost::filesystem::path;
 //using boost::property_tree::write_json;
 int main()
 {
-    string dataDir = "d:/videoSearchServer/data";
-    string logDir = "d:/videoSearchServer/log";
-    string algoConf = "D:\\videoSearchServer\\conf\\algo.conf";
+    string root = "d:/videoSearchServer";
 
     string videoDir = "D:/videos/tar";
-
     vector<path> vec_path;
 
     path p(videoDir);
@@ -64,7 +56,7 @@ int main()
     vector<string> tar_videoNames;
     transform(vec_path.begin(), vec_path.end(), back_inserter(tar_videoNames), [](path &p){ return p.string(); });
 
-    vs::VideoIndexEngine indexEngine(dataDir, logDir, algoConf);
+    vs::VideoIndexEngine indexEngine(root);
 
     clock_t beg;
     
