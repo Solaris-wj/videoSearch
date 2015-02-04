@@ -4,6 +4,7 @@
 
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/archive/binary_oarchive.hpp>
+#include <boost/serialization/serialization.hpp>
 #include <boost/serialization/vector.hpp>
 
 #include <unordered_map>
@@ -16,12 +17,12 @@ namespace boost
 {
     namespace serialization
     {
-        //shared ptr
-        template<class Archive, class T>
-        void serialize(Archive & ar, std::shared_ptr<T> &pT, const unsigned int version)
-        {
-            ar & *pT.get();
-        }
+        //shared ptr, shared ptr 有继承关系，会出错
+//         template<class Archive, class T>
+//         void serialize(Archive & ar, std::shared_ptr<T> &pT, const unsigned int version)
+//         {
+//             ar & *pT.get();
+//         }
 
         //cv::Mat 
         template<class Archive>
@@ -70,12 +71,12 @@ namespace boost
         void serialize(Archive &ar, cv::KeyPoint &kp, const unsigned int version)
         {
             ar & kp.pt.x;
-            ar & kp.pt.y;
-            ar & kp.angle;
-            ar & kp.class_id;
-            ar & kp.octave;
-            ar & kp.response;
-            ar & kp.size;
+             ar & kp.pt.y;
+ //            ar & kp.angle;
+//             ar & kp.class_id;
+//             ar & kp.octave;
+//             ar & kp.response;
+//             ar & kp.size;
         }
 
         template<class Archive>

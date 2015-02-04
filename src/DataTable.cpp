@@ -5,6 +5,11 @@
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/archive/binary_oarchive.hpp>
 
+
+#include <boost/archive/text_iarchive.hpp>
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/serialization/serialization.hpp>
+
 #include "Serialization.h"
 
 
@@ -28,11 +33,11 @@ namespace vs
     int DataTable::insertVideo(const string videoName)
     {
         //already exist 
-        auto iter=vn2vid_.find(videoName);
+        auto iter = vn2vid_.find(videoName);
         if (iter != vn2vid_.end())
             return -1;
 
-        size_t vid = vn2vid_.size() ;
+        size_t vid = vn2vid_.size();
         vn2vid_.insert(make_pair(videoName, vid));
         vid2vn_.insert(make_pair(vid, videoName));
 
@@ -52,7 +57,7 @@ namespace vs
         ::flann::Matrix<float> points((float *)(feat->data), feat->rows, feat->cols);
         vector<size_t> frameIds = frameIndex_->addPoints(points);
 
-        for (size_t i = 0; i !=frameIds.size(); ++i)
+        for (size_t i = 0; i != frameIds.size(); ++i)
         {
             gFmId2vid_.insert(make_pair(frameIds[i], vid));
             gFmId2lFmId_.insert(make_pair(frameIds[i], i));
@@ -63,32 +68,37 @@ namespace vs
         string videoDataPath = getVideoDataPath(videoName);
         vid2vDataPath_.insert(make_pair(vid, videoDataPath));
 
-        ofstream ofs(videoDataPath);
+        ofstream ofs(videoDataPath, std::ios::binary);
         boost::archive::binary_oarchive oar(ofs);
-        
-        if (kfm != NULL)
-        {
-            oar & *kfm.get();
-        }
-        if (keys != NULL)
-        {
-            oar & *keys.get();
-        }
-        if (desc != NULL)
-        {
-            oar & *desc.get();
-        }
-        
+
+        oar & *kfm.get();
+        oar & *keys.get();
+        oar & *desc.get();
+
+
         isChanged = true;
         return 0;
     }
 
+
+    void DataTable::getVideoData(int vid, vector<KeyFrame> &kfm, vector<vector<KeyPoint>> &keys, vector<Mat> &desc)
+    {
+        string &path = vid2vDataPath_.at(vid);
+        ifstream ifs(path,std::ios::binary);
+        //ifstream ifs(path);
+        boost::archive::binary_iarchive iar(ifs);
+
+        iar & kfm;
+        iar & keys;
+        iar & desc;
+    }
+
     void DataTable::deleteVideos(vector<string> videoNames)
     {
-         for (size_t i = 0; i < videoNames.size(); i++)
+        for (size_t i = 0; i < videoNames.size(); i++)
         {
-             deleteVideo(videoNames[i]);
-        }           
+            deleteVideo(videoNames[i]);
+        }
 
     }
 
@@ -102,7 +112,7 @@ namespace vs
 
         vid2vDataPath_.erase(vid);
         videoFrameFeats_.erase(vid);
-        
+
         auto iter2 = vid2gFmId_.find(vid);
 
         auto &vec = iter2->second;
@@ -114,8 +124,8 @@ namespace vs
         vid2gFmId_.erase(iter2);
 
         deleteVideoDataFrameDisk(vid);
-     
-        vn2vid_.erase(iter); 
+
+        vn2vid_.erase(iter);
         isChanged = true;
     }
 
@@ -137,7 +147,7 @@ namespace vs
     {
         if (!isChanged)
             return;
-        
+
         int videoNum = vn2vid_.size();
         oar & vn2vid_;
 
@@ -155,7 +165,7 @@ namespace vs
     }
 
     void DataTable::load()
-    {        
+    {
         boost::filesystem::path p(indexDataFileName);
         if (!exists(p) || !is_directory(p))
             return;
@@ -174,11 +184,11 @@ namespace vs
             return;
 
         frameIndex_->save(p.string());
-     
+
         int videoNum = vn2vid_.size();
 
         iar & videoNum;
-        
+
         for (size_t i = 0; i < videoNum; i++)
         {
             string vn;
@@ -197,30 +207,18 @@ namespace vs
             vector<size_t> gfm;
             iar & gfm;
 
-            for(size_t j = 0; j = !gfm.size(); ++j)
+            for (size_t j = 0; j = !gfm.size(); ++j)
             {
                 gFmId2vid_.insert(make_pair(gfm[j], vid));
                 gFmId2lFmId_.insert(make_pair(gfm[j], j));
             }
 
-            vid2gFmId_.insert(make_pair(vid,move(gfm)));            
+            vid2gFmId_.insert(make_pair(vid, move(gfm)));
 
         }
         //isChanged = false;  //insertVideo will set this value to true
         return;
     }
-
-    void DataTable::getVideoData(int vid, vector<KeyFrame> &kfm, vector<vector<KeyPoint>> &keys, vector<Mat> &desc)
-    {
-        string &path = vid2vDataPath_.at(vid);
-        ifstream ifs(path);
-        boost::archive::binary_iarchive iar(ifs);
-
-        iar & kfm;
-        iar & keys;
-        iar & desc;
-    }
-
 
 
 
