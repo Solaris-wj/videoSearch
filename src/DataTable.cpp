@@ -1,11 +1,10 @@
 #include "DataTable.h"
+
+#include <stdio.h>
+
 #include <boost/filesystem.hpp>
-
-
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/archive/binary_oarchive.hpp>
-
-
 #include <boost/archive/text_iarchive.hpp>
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/serialization/serialization.hpp>
@@ -134,6 +133,8 @@ namespace vs
         string vn = vid2vn_.at(vid);
         string videoDataPath = getVideoDataPath(vn);
 
+        remove(videoDataPath.c_str());
+
     }
 
     void DataTable::save()
@@ -157,7 +158,7 @@ namespace vs
             oar & pa.first;
             oar & pa.second;
 
-            oar & videoFrameFeats_.at(vid);
+            oar & *(videoFrameFeats_.at(vid).get());
             oar & vid2gFmId_.at(vid);
         }
 
@@ -201,7 +202,7 @@ namespace vs
             vid2vDataPath_.insert(make_pair(vid, getVideoDataPath(vn)));
 
             shared_ptr<Mat> feat(new Mat);
-            iar &feat;
+            iar & *feat.get();
             videoFrameFeats_.insert(make_pair(vid, feat));
 
             vector<size_t> gfm;
