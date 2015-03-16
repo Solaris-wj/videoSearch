@@ -207,7 +207,8 @@ namespace vs
 
         if (-1 == videoTable_.getFeatExactor().exactFeatures(searchVideoName, *keyFrames.get(), *feat.get(), *keys.get(), *desc.get()))
         {
-            vec_jsonResult = vector<string>();
+            //vec_jsonResult = vector<string>();
+            //jsonResult ;
             return -1;
         }                
 
