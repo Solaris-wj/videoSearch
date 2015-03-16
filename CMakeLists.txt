@@ -7,8 +7,11 @@ if(NOT CMAKE_BUIILD_TYPE)
 endif()
 
 find_package(Boost REQUIRED)
-find_package(Opencv REQUIRED)
+find_package(OpenCV REQUIRED)
 
 include_directories(src)
+
+set (CMAKE_CXX_COMPILER clang++)
+add_definitions(-std=c++11)
 add_subdirectory(src)
 add_subdirectory(test)
