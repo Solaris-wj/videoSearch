@@ -198,7 +198,7 @@ namespace vs
     }
 
     clock_t start;
-    int VideoIndexEngine::searchVideo(std::string &searchVideoName, vector<std::string> &jsonResult)
+    int VideoIndexEngine::searchVideo(std::string &searchVideoName, std::string jsonResult)
     {
         shared_ptr<vector<KeyFrame>> keyFrames(new vector<KeyFrame>);
         shared_ptr<Mat> feat(new Mat);
@@ -207,7 +207,7 @@ namespace vs
 
         if (-1 == videoTable_.getFeatExactor().exactFeatures(searchVideoName, *keyFrames.get(), *feat.get(), *keys.get(), *desc.get()))
         {
-            jsonResult = vector<string>();
+            vec_jsonResult = vector<string>();
             return -1;
         }                
 
@@ -244,6 +244,9 @@ namespace vs
         std::sort(votesMap.begin(), votesMap.end(), [](pair<int, int> &v1, pair<int, int> &v2){ return v1.second > v2.second; });
 
         int vFrameCnt = feat->rows;
+
+        vector<std::string> vec_jsonResult;
+
         for (size_t i = 0; i != votesMap.size(); ++i)
         {
             int match_num=match_frames[votesMap[i].first].size();
@@ -315,11 +318,26 @@ namespace vs
 
             genJsonStr(videoTable_.getVideoName(votesMap[i].first), finalMatchResult_det, finalMatchResult_tar, result);
 
-            jsonResult.push_back(result);
+            vec_jsonResult.push_back(result);
             
             //Mat resultImg = drawDetResult(vFrameCnt / param_.used_fps, finalMatchResult_det, frameCnt_tar / param_.used_fps, finalMatchResult_tar);
             //saveResult(videoName, videoNames_[votesMap[i].first], result, resultImg);
         }
+
+        Document d;
+        d.SetArray();
+
+        auto & alloc = d.GetAllocator();
+        for (size_t i = 0; i != vec_jsonResult.size(); ++i)
+        {
+            Value v(vec_jsonResult[i].c_str(), alloc);
+            d.PushBack(v,alloc);
+        }
+
+        StringBuffer buffer;
+        PrettyWriter<StringBuffer> writer(buffer);
+        d.Accept(writer);
+        jsonResult= buffer.GetString();
 
         return 0;
     }

@@ -24,7 +24,7 @@ namespace vs
         ~VideoIndexEngine();
         int addVideo(std::vector<std::string> &videoNames);
         int addVideo(std::string &videoName);
-        int searchVideo(std::string &videoName, std::vector<std::string> &jsonResult);
+        int searchVideo(std::string &videoName, std::string jsonResult);
         int deleteVideo(std::string &videoName);
         int deleteVideos(std::vector<std::string> &videoNames);
     private:

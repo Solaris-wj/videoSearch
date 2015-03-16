@@ -20,9 +20,55 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\javaCodes\VideoSearch\jni\casia_isiteam_slave_IndexJNIimpl.h" />
+    <ClInclude Include="..\src\colorFeat.h" />
+    <ClInclude Include="..\src\DataTable.h" />
+    <ClInclude Include="..\src\FeatExactor.h" />
+    <ClInclude Include="..\src\flann\algorithms\all_indices.h" />
+    <ClInclude Include="..\src\flann\algorithms\center_chooser.h" />
+    <ClInclude Include="..\src\flann\algorithms\dist.h" />
+    <ClInclude Include="..\src\flann\algorithms\hierarchical_clustering_index.h" />
+    <ClInclude Include="..\src\flann\algorithms\nn_index.h" />
+    <ClInclude Include="..\src\flann\config.h" />
+    <ClInclude Include="..\src\flann\defines.h" />
+    <ClInclude Include="..\src\flann\ext\lz4.h" />
+    <ClInclude Include="..\src\flann\ext\lz4hc.h" />
+    <ClInclude Include="..\src\flann\flann.hpp" />
+    <ClInclude Include="..\src\flann\general.h" />
+    <ClInclude Include="..\src\flann\util\allocator.h" />
+    <ClInclude Include="..\src\flann\util\any.h" />
+    <ClInclude Include="..\src\flann\util\dynamic_bitset.h" />
+    <ClInclude Include="..\src\flann\util\heap.h" />
+    <ClInclude Include="..\src\flann\util\logger.h" />
+    <ClInclude Include="..\src\flann\util\matrix.h" />
+    <ClInclude Include="..\src\flann\util\object_factory.h" />
+    <ClInclude Include="..\src\flann\util\params.h" />
+    <ClInclude Include="..\src\flann\util\random.h" />
+    <ClInclude Include="..\src\flann\util\result_set.h" />
+    <ClInclude Include="..\src\flann\util\sampling.h" />
+    <ClInclude Include="..\src\flann\util\saving.h" />
+    <ClInclude Include="..\src\flann\util\serialization.h" />
+    <ClInclude Include="..\src\flann\util\timer.h" />
+    <ClInclude Include="..\src\index_sort.h" />
+    <ClInclude Include="..\src\KeyFrameExactor.h" />
+    <ClInclude Include="..\src\NonCopyable.h" />
+    <ClInclude Include="..\src\Preprocessor.h" />
+    <ClInclude Include="..\src\Serialization.h" />
+    <ClInclude Include="..\src\VideoIndexEngine.h" />
+    <ClInclude Include="..\src\VideoReader.h" />
+    <ClInclude Include="..\src\VideoSearchParam.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="impl.cpp" />
+    <ClCompile Include="..\src\colorFeat.cpp" />
+    <ClCompile Include="..\src\DataTable.cpp" />
+    <ClCompile Include="..\src\FeatExactor.cpp" />
+    <ClCompile Include="..\src\flann\ext\lz4.c" />
+    <ClCompile Include="..\src\flann\ext\lz4hc.c" />
+    <ClCompile Include="..\src\jniImplementation\impl.cpp" />
+    <ClCompile Include="..\src\KeyFrameExactor.cpp" />
+    <ClCompile Include="..\src\Preprocessor.cpp" />
+    <ClCompile Include="..\src\VideoIndexEngine.cpp" />
+    <ClCompile Include="..\src\VideoReader.cpp" />
+    <ClCompile Include="..\src\VideoSearchParam.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{B802DEA3-52C1-4CEE-A592-5EA95CCF7C7F}</ProjectGuid>
@@ -37,7 +83,7 @@
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v120</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
@@ -50,7 +96,7 @@
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v120</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
