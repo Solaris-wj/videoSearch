@@ -1,6 +1,6 @@
 
 
-#include "../src/KeyFrameExactor.h"
+#include "../video_search//KeyFrameExactor.h"
 #include <iostream>
 #include <string>
 #include <vector>
@@ -8,18 +8,9 @@
 
 #include <opencv2/opencv.hpp>
 
-#include "../src/Preprocessor.h"
-#include "../src/VideoReader.h"
+#include "../video_search/Preprocessor.h"
+#include "../video_search/VideoReader.h"
 
-#ifdef _DEBUG
-#pragma comment(lib,"opencv_core249d.lib")
-#pragma comment(lib,"opencv_highgui249d.lib")
-#pragma comment(lib,"opencv_imgproc249d.lib")
-#else
-#pragma comment(lib,"opencv_core249.lib")
-#pragma comment(lib,"opencv_highgui249.lib")
-#pragma comment(lib,"opencv_imgproc249.lib")
-#endif
 using namespace std;
 using namespace cv;
 

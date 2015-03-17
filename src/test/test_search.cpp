@@ -1,4 +1,3 @@
-#include <vld.h>
 
 #include <time.h>
 #include <iostream>
@@ -13,29 +12,9 @@
 #include <boost/filesystem.hpp>
 //#include <boost/property_tree/json_parser.hpp>
 
-#include "../src/VideoReader.h"
-#include "../src/VideoIndexEngine.h"
+#include "../video_search/VideoReader.h"
+#include "../video_search//VideoIndexEngine.h"
 
-#ifdef WIN32
-#ifdef _DEBUG
-#pragma comment(lib,"opencv_core249d.lib")
-#pragma comment(lib,"opencv_highgui249d.lib")
-#pragma comment(lib,"opencv_imgproc249d.lib")
-#pragma comment(lib,"opencv_features2d249d.lib")
-
-#else
-#pragma comment(lib,"opencv_core249.lib")
-#pragma comment(lib,"opencv_highgui249.lib")
-#pragma comment(lib,"opencv_imgproc249.lib")
-#pragma comment(lib,"opencv_features2d249.lib")
-// #pragma comment(lib,"libboost_filesystem-vc120-mt-1_57.lib")
-// #pragma comment(lib,"libboost_serialization-vc120-mt-1_57.lib")
-
-#pragma comment(lib,"boost_filesystem-vc120-mt-1_57.lib")
-#pragma comment(lib,"boost_serialization-vc120-mt-1_57.lib")
-
-#endif
-#endif
 using namespace std;
 using namespace cv;
 //using namespace boost;
