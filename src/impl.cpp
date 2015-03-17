@@ -1,7 +1,7 @@
 
 #include "casia_isiteam_videosearch_slave_IndexJNI.h"
 
-#include "../VideoIndexEngine.h"
+#include "VideoIndexEngine.h"
 
 #include <string>
 #include <vector>

@@ -36,7 +36,7 @@
 #include <cstddef>
 #include <vector>
 
-#include "flann/general.h"
+#include "../general.h"
 
 namespace flann
 {

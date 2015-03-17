@@ -33,8 +33,8 @@
 #include <vector>
 #include <stdio.h>
 
-#include "flann/general.h"
-#include "flann/util/serialization.h"
+#include "../general.h"
+#include "../util/serialization.h"
 
 
 #ifdef FLANN_SIGNATURE_

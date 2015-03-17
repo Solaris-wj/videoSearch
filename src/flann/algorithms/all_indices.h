@@ -33,7 +33,7 @@
 #include "../general.h"
 #include "nn_index.h"
 
-#include "util/dynamic_bitset.h"
+#include "../util/dynamic_bitset.h"
 //#include "flann/algorithms/linear_index.h"
 #include "hierarchical_clustering_index.h"
 

@@ -6,8 +6,8 @@
 #include <cstdlib>
 #include <cstring>
 #include <stdio.h>
-#include "flann/ext/lz4.h"
-#include "flann/ext/lz4hc.h"
+#include "../ext/lz4.h"
+#include "../ext/lz4hc.h"
 
 
 namespace flann

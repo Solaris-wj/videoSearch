@@ -32,7 +32,7 @@ set(videosearch_src
 set(video_search_jni_src impl.cpp)
 
 include_directories(D:/CodeCollection/javaCodes/videoSearchWS/jni)
-include_directories(flann)
+#include_directories(flann)
 add_library(video_search SHARED ${videosearch_src})
 target_link_libraries(video_search ${OpenCV_LIBS})
 
