@@ -19,7 +19,7 @@ link_directories(C:/local/boost_1_57_0/lib64-msvc-12.0)
 else()
 find_package(Boost REQUIRED)
 add_definitions(-std=c++11)
-set(CMAKE_CXX_COMPILER clang++)
+#set(CMAKE_CXX_COMPILER clang++)
 endif()
 
 
