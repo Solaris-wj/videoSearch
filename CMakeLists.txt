@@ -16,18 +16,24 @@ find_package(OpenCV REQUIRED)
 if(WIN32)
 include_directories(C:/local/boost_1_57_0)
 link_directories(C:/local/boost_1_57_0/lib64-msvc-12.0)
-else()
-find_package(Boost REQUIRED)
-add_definitions(-std=c++11)
-set(CMAKE_CXX_COMPILER clang++)
-endif()
-
-
-
 
 #jni header files
 include_directories(C:/Program\ Files/Java/jdk1.7.0_75/include)
 include_directories(C:/Program\ Files/Java/jdk1.7.0_75/include/win32)
+
+else()
+find_package(Boost REQUIRED)
+add_definitions(-std=c++11)
+set(CMAKE_CXX_COMPILER clang++)
+
+#jni header files
+include_directories(/home/ufo/programs/jdk1.8.0_25/include)
+include_directories(/home/ufo/programs/jdk1.8.0_25/include/linux)
+
+endif()
+
+
+
 #include_directories(src)
 
 
