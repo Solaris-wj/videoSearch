@@ -766,7 +766,7 @@ protected:
         {
     		points_[i] = new_points[i-size_];
             ids_[i] = next_id();
-            id2index.insert(make_pair(ids_[i], i));
+            id2index.insert(std::make_pair(ids_[i], i));
             vec_ret.push_back(ids_[i]);
     		if (removed_)
             {

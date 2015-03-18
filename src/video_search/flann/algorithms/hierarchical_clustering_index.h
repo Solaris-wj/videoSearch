@@ -182,7 +182,7 @@ public:
         assert(veclen_ == 0 || points.cols == veclen_);
         size_t old_size = size_;
 
-        vector<size_t> vec_ret=extendDataset(points);
+        std::vector<size_t> vec_ret=extendDataset(points);
 
         if (rebuild_threshold > 1 && size_at_build_*rebuild_threshold < size_) {
             buildIndex();

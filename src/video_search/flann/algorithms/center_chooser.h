@@ -9,6 +9,7 @@
 #define CENTER_CHOOSER_H_
 
 #include "../util/matrix.h"
+#include "../util/random.h"
 
 namespace flann
 {
