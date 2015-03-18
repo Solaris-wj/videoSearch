@@ -242,7 +242,7 @@ namespace vs
         printf("match_frames num=%d\n", match_frames.size());
         //sort vote result
         vector<pair<int, int>> votesMap(votes.begin(), votes.end());
-        std::sort(votesMap.begin(), votesMap.end(), [](pair<int, int> &v1, pair<int, int> &v2){ return v1.second > v2.second; });
+        std::sort(votesMap.begin(), votesMap.end(), [](pair<int, int> v1, pair<int, int> v2){ return v1.second > v2.second; });
 
         int vFrameCnt = feat->rows;
 

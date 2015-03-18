@@ -5,8 +5,9 @@ namespace vs
 {
     class NonCopyable
     {
-    private:
+    public:
         NonCopyable() = default;
+    private:        
         NonCopyable(const NonCopyable &) = delete;
         NonCopyable & operator = (const NonCopyable) = delete;
     };
