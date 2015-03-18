@@ -23,6 +23,12 @@ include_directories(C:/Program\ Files/Java/jdk1.7.0_75/include/win32)
 
 else()
 find_package(Boost REQUIRED)
+include_directories(${Boost_INCLUDE_DIRS})
+link_directories(${Boost_LIBRARY_DIRS})
+
+message(STATUS ${Boost_LIBRARY_DIRS})
+message(STATUS ${Boost_LIBRARIES})
+
 add_definitions(-std=c++11)
 set(CMAKE_CXX_COMPILER clang++)
 
@@ -34,7 +40,7 @@ endif()
 
 
 
-#include_directories(src)
+
 
 
 macro(source_group_by_dir source_files)
