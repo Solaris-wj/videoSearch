@@ -18,7 +18,7 @@ namespace vs
 
         if (!videoReader.isOpened())
         {
-            cout << videoName << "  ´ò¿ªÊ§°Ü" << endl;
+            cout << "failed to open video" << videoName << endl;
             return -1;
         }
 

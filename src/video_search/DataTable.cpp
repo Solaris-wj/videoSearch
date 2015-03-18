@@ -208,7 +208,7 @@ namespace vs
             vector<size_t> gfm;
             iar & gfm;
 
-            for (size_t j = 0; j = !gfm.size(); ++j)
+            for (size_t j = 0; j != gfm.size(); ++j)
             {
                 gFmId2vid_.insert(make_pair(gfm[j], vid));
                 gFmId2lFmId_.insert(make_pair(gfm[j], j));
